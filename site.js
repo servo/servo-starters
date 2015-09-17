@@ -1,39 +1,74 @@
 var d = React.DOM;
 
 var getIssues = function(callback) {
-    var issuesUrl = "https://api.github.com/repos/servo/servo/issues";
+    var issuesUrl = "https://api.github.com/search/issues";
 
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: {labels: "E-Easy"},
+        data: "q=state:open+-label:C-assigned+label:E-Easy+repo:servo/servo&sort=created"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: {labels: "E-Less easy"},
+        data: "q=state:open+-label:C-assigned+label:\"E-Less%20easy\"+repo:servo/servo&sort=created"
     });
 
     $.when(easy, lessEasy).done(function(r1, r2) {
-        var easies = r1[0],
-            lessEasies = r2[0],
+        var easies = r1[0].items,
+            lessEasies = r2[0].items,
             all = easies.concat(lessEasies);
 
-        all.sort(function(l, r) { return r.number - l.number });
+        all.sort(function(l, r) { return r.created_at.localeCompare(l.created_at) });
 
         callback(all);
     });
 };
 
+var label = function(data) {
+    var color = (data.color == "d7e102" ||
+                 data.color == "bfd4f2" ||
+                 data.color == "d4c5f9" ||
+                 data.color == "02d7e1") ? "black" : "white";
+    return d.span(
+        {className: "label", style: {backgroundColor: "#" + data.color, color: color}},
+        data.name
+    );
+}
+
+var Labels = React.createClass({
+    render: function() {
+        return d.span(
+            {className: "labels"},
+            this.props.labels.map(label)
+        );
+    }
+});
+
+var labels = function(data) {
+    return React.createElement(Labels, data);
+}
+
 var Issue = React.createClass({
     render: function() {
         return d.li(
             {className: "issue"},
+            "[ ",
             d.a(
-                {href: this.props.html_url, title: this.props.title},
+                {
+                    className: "issue-link",
+                    href: this.props.html_url,
+                    title: this.props.title
+                },
+                this.props.number
+            ),
+            " ] - ",
+            d.span(
+                {className: "issue-desc"},
                 this.props.title
-            )
+            ),
+            labels(this.props)
         );
     }
 });
@@ -47,7 +82,8 @@ var IssueList = React.createClass({
         getIssues(function(data) {
             if (this.isMounted()) {
                 this.setState({
-                    issues: data
+                    issues: data,
+                    loading: false
                 });
             }
         }.bind(this));
@@ -55,20 +91,25 @@ var IssueList = React.createClass({
 
     getInitialState: function() {
         return {
-            issues: []
+            issues: [],
+            loading: true
         };
     },
 
     render: function() {
-        return d.ul(
-            {id: "issues"},
-            this.state.issues.map(issueItem)
-        );
+        if (this.state.loading) {
+            return d.div({id: "loading"});
+        } else {
+            return d.ul(
+                {id: "issues"},
+                this.state.issues.map(issueItem)
+            );
+        }
     }
 });
 
 React.render(
     React.createElement(IssueList, {}),
-    document.getElementById("app")
+    document.getElementById("open-issues")
 );
 

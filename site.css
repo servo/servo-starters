@@ -1,0 +1,47 @@
+body {
+    padding: 10px 50px;
+}
+
+h1 {
+    color: #2196f3;
+}
+
+a {
+    color: #e91e63;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    border-bottom: 3px solid #ffeb3b;
+}
+
+#content {
+    max-width: 768px;
+    margin: 0 auto;
+}
+
+#issues {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#issues li {
+    margin-bottom: 20px;
+}
+
+.labels {
+    text-align: right;
+    margin: 10px auto;
+}
+
+.label {
+    display: inline-block;
+    color: white;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 4px 8px;
+    margin: 5px;
+    border-radius: 3px;
+}
