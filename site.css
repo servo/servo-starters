@@ -32,15 +32,19 @@ a:hover {
 }
 
 .labels {
-    text-align: right;
     margin: 10px auto;
+    margin-top: 0;
+}
+
+.label:first-child {
+    margin-left: 0;
 }
 
 .label {
     display: inline-block;
     color: white;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 9px;
     padding: 4px 8px;
     margin: 5px;
     border-radius: 3px;
