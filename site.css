@@ -70,3 +70,20 @@ a:hover {
         transform: rotate(359deg);
     }
 }
+
+h2 {
+    border-bottom: 3px solid;
+    padding-bottom: 10px;
+}
+
+.view-all {
+    text-align: center;
+    font-style: italic;
+    color: #2196f3;
+    padding: 10px;
+}
+
+.view-all:hover {
+    cursor: pointer;
+    background-color: #eee;
+}

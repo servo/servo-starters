@@ -115,7 +115,8 @@ var IssueList = React.createClass({
             if (this.isMounted()) {
                 this.setState({
                     issues: data,
-                    loading: false
+                    loading: false,
+                    limited: data.length > 5
                 });
             }
         }.bind(this));
@@ -124,7 +125,8 @@ var IssueList = React.createClass({
     getInitialState: function() {
         return {
             issues: [],
-            loading: true
+            loading: true,
+            limited: false
         };
     },
 
@@ -132,9 +134,29 @@ var IssueList = React.createClass({
         if (this.state.loading) {
             return d.div({id: "loading"});
         } else {
+            var issues;
+
+            if (this.state.limited) {
+                issues = this.state.issues.map(issueItem)
+                                          .slice(0, 5)
+                                          .concat(
+                                              d.div(
+                                                  {
+                                                      className: "view-all",
+                                                      onClick: function() {
+                                                          this.setState({limited: false})
+                                                      }.bind(this)
+                                                  },
+                                                  "view all..."
+                                              )
+                                          );
+            } else {
+                issues = this.state.issues.map(issueItem);
+            }
+
             return d.ul(
                 {id: "issues"},
-                this.state.issues.map(issueItem)
+                issues
             );
         }
     }
