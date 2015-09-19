@@ -66,6 +66,27 @@ var label = function(data) {
     );
 }
 
+var FeelingAdventurous = React.createClass({
+    gotoRandomIssue: function() {
+        var issues = this.props.issues;
+
+        var randomIndex = Math.floor(Math.random() * (issues.length + 1));
+
+        window.location.href = issues[randomIndex].html_url;
+    },
+
+    render: function() {
+        return d.button(
+            {className: "button", onClick: this.gotoRandomIssue},
+            "I'm Feeling Adventurous..."
+        );
+    }
+});
+
+var feelingAdventurous = function(issues) {
+    return React.createElement(FeelingAdventurous, {issues: issues});
+};
+
 var Labels = React.createClass({
     render: function() {
         return d.div(
@@ -110,34 +131,20 @@ var issueItem = function(data) {
 }
 
 var IssueList = React.createClass({
-    componentDidMount: function() {
-        this.props.loader(function(data) {
-            if (this.isMounted()) {
-                this.setState({
-                    issues: data,
-                    loading: false,
-                    limited: data.length > 5
-                });
-            }
-        }.bind(this));
-    },
-
     getInitialState: function() {
         return {
-            issues: [],
-            loading: true,
-            limited: false
+            limited: true
         };
     },
 
     render: function() {
-        if (this.state.loading) {
+        if (this.props.loading) {
             return d.div({id: "loading"});
         } else {
             var issues;
 
             if (this.state.limited) {
-                issues = this.state.issues.map(issueItem)
+                issues = this.props.issues.map(issueItem)
                                           .slice(0, 5)
                                           .concat(
                                               d.div(
@@ -151,7 +158,7 @@ var IssueList = React.createClass({
                                               )
                                           );
             } else {
-                issues = this.state.issues.map(issueItem);
+                issues = this.props.issues.map(issueItem);
             }
 
             return d.ul(
@@ -162,13 +169,50 @@ var IssueList = React.createClass({
     }
 });
 
-React.render(
-    React.createElement(IssueList, {loader: getOpenIssues}),
-    document.getElementById("open-issues")
-);
+var issueList = function(issues, loading) {
+    return React.createElement(IssueList, {issues: issues, loading: loading});
+};
+
+var App = React.createClass({
+    componentDidMount: function() {
+        getOpenIssues(function(data) {
+            this.setState({
+                openIssues: data,
+                openIssuesLoading: false
+            });
+        }.bind(this));
+
+        getPotentiallyOpenIssues(function(data) {
+            this.setState({
+                potentiallyOpenIssues: data,
+                potentiallyOpenIssuesLoading: false
+            });
+        }.bind(this));
+    },
+
+    getInitialState: function() {
+        return {
+            openIssuesLoading: true,
+            potentiallyOpenIssuesLoading: true,
+            openIssues: [],
+            potentiallyOpenIssues: []
+        };
+    },
+
+    render: function() {
+        return d.div(
+            {},
+            this.state.openIssuesLoading ? [] : feelingAdventurous(this.state.openIssues),
+            d.h2({}, "Open Issues"),
+            issueList(this.state.openIssues, this.state.openIssuesLoading),
+            d.h2({}, "Potentially Open Issues"),
+            issueList(this.state.potentiallyOpenIssues, this.state.potentiallyOpenIssuesLoading)
+        );
+    }
+});
 
 React.render(
-    React.createElement(IssueList, {loader: getPotentiallyOpenIssues}),
-    document.getElementById("potentially-open-issues")
+    React.createElement(App, {}),
+    document.getElementById("app")
 );
 

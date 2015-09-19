@@ -87,3 +87,23 @@ h2 {
     cursor: pointer;
     background-color: #eee;
 }
+
+.button {
+    display: block;
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    margin: 0 auto;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: 300ms;
+}
+
+.button:hover {
+    background-color: #ffeb3b;
+    transform: scale(1.1);
+    transition: 300ms;
+    color: black;
+}
