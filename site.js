@@ -9,13 +9,13 @@ var getPotentiallyOpenIssues = function(callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+repo:servo/servo&sort=created"
+        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=created"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+repo:servo/servo&sort=created"
+        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
     });
 
     $.when(easy, lessEasy).done(function(r1, r2) {
@@ -35,13 +35,13 @@ var getOpenIssues = function(callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+label:E-Easy+repo:servo/servo&sort=created"
+        data: "q=state:open+-label:C-assigned+label:E-Easy+user:servo&sort=created"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+label:\"E-Less%20easy\"+repo:servo/servo&sort=created"
+        data: "q=state:open+-label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
     });
 
     $.when(easy, lessEasy).done(function(r1, r2) {
