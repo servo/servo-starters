@@ -60,7 +60,9 @@ var label = function(data) {
                  data.color == "bfd4f2" ||
                  data.color == "d4c5f9" ||
                  data.color == "02d7e1") ? "black" : "white";
-    var label = makeLabelFriendly(data.name)
+
+    var label = makeLabelFriendly(data.name);
+
     return d.span(
         {className: "label", style: {backgroundColor: "#" + data.color, color: color}},
         label
@@ -74,7 +76,7 @@ var replacers = [
   {matcher: /^P-(.*)/, replacement: "Platform: "},
   {matcher: /^B-(.*)/, replacement: ""},
   {matcher: /^I-(.*)/, replacement: "Category: "}
-]
+];
 
 var makeLabelFriendly = function (label) {
   var newLabel = label;
@@ -83,7 +85,7 @@ var makeLabelFriendly = function (label) {
     "E-easy": "Good first PR",
     "E-Easy": "Good first PR",
     "E-less easy": "Mentored"
-  }
+  };
 
   if (labelMap[label]) {
     return newLabel = labelMap[label];
@@ -99,8 +101,8 @@ var makeLabelFriendly = function (label) {
 };
 
 var extractLabel = function (label, regex) {
-  return label.match(regex)[1]
-}
+  return label.match(regex)[1];
+};
 
 var FeelingAdventurous = React.createClass({
     gotoRandomIssue: function() {
