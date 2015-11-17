@@ -9,13 +9,13 @@ var getPotentiallyOpenIssues = function(callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=created"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=updated"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=updated"
     });
 
     $.when(easy, lessEasy).done(function(r1, r2) {
@@ -23,7 +23,7 @@ var getPotentiallyOpenIssues = function(callback) {
             lessEasies = r2[0].items,
             all = easies.concat(lessEasies);
 
-        all.sort(function(l, r) { return r.created_at.localeCompare(l.created_at) });
+        all.sort(function(l, r) { return r.updated_at.localeCompare(l.updated_at) });
 
         callback(all);
     });
@@ -60,11 +60,49 @@ var label = function(data) {
                  data.color == "bfd4f2" ||
                  data.color == "d4c5f9" ||
                  data.color == "02d7e1") ? "black" : "white";
+
+    var label = makeLabelFriendly(data.name);
+
     return d.span(
         {className: "label", style: {backgroundColor: "#" + data.color, color: color}},
-        data.name
+        label
     );
 }
+
+var replacers = [
+  {matcher: /^L-(.*)/, replacement: "Language: "},
+  {matcher: /^A-(.*)/, replacement: "Area: "},
+  {matcher: /^(?:S-|C-)(.*)/, replacement: "Status: "},
+  {matcher: /^P-(.*)/, replacement: "Platform: "},
+  {matcher: /^B-(.*)/, replacement: ""},
+  {matcher: /^I-(.*)/, replacement: "Category: "}
+];
+
+var makeLabelFriendly = function (label) {
+  var newLabel = label;
+
+  var labelMap = {
+    "E-easy": "Good first PR",
+    "E-Easy": "Good first PR",
+    "E-less easy": "Mentored"
+  };
+
+  if (labelMap[label]) {
+    return newLabel = labelMap[label];
+  }
+
+  replacers.forEach(function (item) {
+    if(item.matcher.test(label)) {
+      newLabel = item.replacement + extractLabel(label, item.matcher);
+    }
+  })
+
+  return newLabel;
+};
+
+var extractLabel = function (label, regex) {
+  return label.match(regex)[1];
+};
 
 var FeelingAdventurous = React.createClass({
     gotoRandomIssue: function() {
@@ -215,4 +253,3 @@ React.render(
     React.createElement(App, {}),
     document.getElementById("app")
 );
-
