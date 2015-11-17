@@ -9,13 +9,13 @@ var getPotentiallyOpenIssues = function(callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=created"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=updated"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=created:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=updated"
     });
 
     $.when(easy, lessEasy).done(function(r1, r2) {
@@ -23,7 +23,7 @@ var getPotentiallyOpenIssues = function(callback) {
             lessEasies = r2[0].items,
             all = easies.concat(lessEasies);
 
-        all.sort(function(l, r) { return r.created_at.localeCompare(l.created_at) });
+        all.sort(function(l, r) { return r.updated_at.localeCompare(l.updated_at) });
 
         callback(all);
     });
@@ -215,4 +215,3 @@ React.render(
     React.createElement(App, {}),
     document.getElementById("app")
 );
-
