@@ -86,7 +86,7 @@ var makeLabelFriendly = function (label) {
   }
 
   if (labelMap[label]) {
-    newLabel = labelMap[label];
+    return newLabel = labelMap[label];
   }
 
   replacers.forEach(function (item) {
