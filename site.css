@@ -32,7 +32,6 @@ a:hover {
 }
 
 .labels {
-    margin: 10px auto;
     margin-top: 0;
 }
 
@@ -106,4 +105,13 @@ h2 {
     transform: scale(1.1);
     transition: 300ms;
     color: black;
+}
+
+.time-wrapper {
+  border-bottom: #CAC7C7 solid 1px;
+  padding-bottom: 5px;
+}
+.time {
+  font-size: 0.75em;
+  color: rgba(140, 139, 139, 0.77);
 }

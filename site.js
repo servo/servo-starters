@@ -1,7 +1,27 @@
+/* global $, React*/
+
 var d = React.DOM;
 
-var getPotentiallyOpenIssues = function(callback) {
-    var issuesUrl = "https://api.github.com/search/issues";
+var timeSort = function (l, r) {
+  return r.created_at.localeCompare(l.created_at);
+};
+
+var extractFunction = function (callback) {
+  return function (r1, r2) {
+    var easies = r1[0].items,
+        lessEasies = r2[0].items,
+        all = easies.concat(lessEasies);
+
+    all.sort(timeSort);
+
+    callback(all);
+  }
+};
+
+var issuesUrl = "https://api.github.com/search/issues";
+
+var getPotentiallyOpenIssues = function (callback) {
+
     var today = new Date(),
         twoWeeksAgo = new Date(today - 86400000 * 14),
         olderThanTwoWeeks = "<" + twoWeeksAgo.toISOString().slice(0, 10);
@@ -18,19 +38,12 @@ var getPotentiallyOpenIssues = function(callback) {
         data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=updated"
     });
 
-    $.when(easy, lessEasy).done(function(r1, r2) {
-        var easies = r1[0].items,
-            lessEasies = r2[0].items,
-            all = easies.concat(lessEasies);
+    var dataExtractor = extractFunction(callback);
 
-        all.sort(function(l, r) { return r.updated_at.localeCompare(l.updated_at) });
-
-        callback(all);
-    });
+    $.when(easy, lessEasy).done(dataExtractor);
 };
 
-var getOpenIssues = function(callback) {
-    var issuesUrl = "https://api.github.com/search/issues";
+var getOpenIssues = function (callback) {
 
     var easy = $.ajax({
         dataType: "json",
@@ -44,30 +57,10 @@ var getOpenIssues = function(callback) {
         data: "q=state:open+-label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
     });
 
-    $.when(easy, lessEasy).done(function(r1, r2) {
-        var easies = r1[0].items,
-            lessEasies = r2[0].items,
-            all = easies.concat(lessEasies);
+    var dataExtractor = extractFunction(callback);
 
-        all.sort(function(l, r) { return r.created_at.localeCompare(l.created_at) });
-
-        callback(all);
-    });
+    $.when(easy, lessEasy).done(dataExtractor);
 };
-
-var label = function(data) {
-    var color = (data.color == "d7e102" ||
-                 data.color == "bfd4f2" ||
-                 data.color == "d4c5f9" ||
-                 data.color == "02d7e1") ? "black" : "white";
-
-    var label = makeLabelFriendly(data.name);
-
-    return d.span(
-        {className: "label", style: {backgroundColor: "#" + data.color, color: color}},
-        label
-    );
-}
 
 var replacers = [
   {matcher: /^L-(.*)/, replacement: "Language: "},
@@ -88,14 +81,14 @@ var makeLabelFriendly = function (label) {
   };
 
   if (labelMap[label]) {
-    return newLabel = labelMap[label];
+    return labelMap[label];
   }
 
   replacers.forEach(function (item) {
-    if(item.matcher.test(label)) {
+    if (item.matcher.test(label)) {
       newLabel = item.replacement + extractLabel(label, item.matcher);
     }
-  })
+  });
 
   return newLabel;
 };
@@ -104,8 +97,22 @@ var extractLabel = function (label, regex) {
   return label.match(regex)[1];
 };
 
+var label = function (data) {
+    var color = (data.color === "d7e102" ||
+                 data.color === "bfd4f2" ||
+                 data.color === "d4c5f9" ||
+                 data.color === "02d7e1") ? "black" : "white";
+
+    var friendlyLabel = makeLabelFriendly(data.name);
+
+    return d.span(
+        {className: "label", style: {backgroundColor: "#" + data.color, color: color}},
+        friendlyLabel
+    );
+};
+
 var FeelingAdventurous = React.createClass({
-    gotoRandomIssue: function() {
+    gotoRandomIssue: function () {
         var issues = this.props.issues;
 
         var randomIndex = Math.floor(Math.random() * (issues.length + 1));
@@ -113,7 +120,7 @@ var FeelingAdventurous = React.createClass({
         window.location.href = issues[randomIndex].html_url;
     },
 
-    render: function() {
+    render: function () {
         return d.button(
             {className: "button", onClick: this.gotoRandomIssue},
             "I'm Feeling Adventurous..."
@@ -121,7 +128,7 @@ var FeelingAdventurous = React.createClass({
     }
 });
 
-var feelingAdventurous = function(issues) {
+var feelingAdventurous = function (issues) {
     return React.createElement(FeelingAdventurous, {issues: issues});
 };
 
@@ -134,12 +141,12 @@ var Labels = React.createClass({
     }
 });
 
-var labels = function(data) {
+var labels = function (data) {
     return React.createElement(Labels, data);
-}
+};
 
 var Issue = React.createClass({
-    render: function() {
+    render: function () {
         return d.li(
             {className: "issue"},
             d.div(
@@ -159,23 +166,29 @@ var Issue = React.createClass({
                     this.props.title
                 )
             ),
-            labels(this.props)
+            labels(this.props),
+            d.div(
+              {className: "time-wrapper"},
+              d.span({className: "time"},
+              d.i({className: "fa fa-clock-o"}),
+              " Last activity: " + moment(this.props.updated_at).fromNow())
+            )
         );
     }
 });
 
-var issueItem = function(data) {
+var issueItem = function (data) {
     return React.createElement(Issue, data);
-}
+};
 
 var IssueList = React.createClass({
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             limited: true
         };
     },
 
-    render: function() {
+    render: function () {
         if (this.props.loading) {
             return d.div({id: "loading"});
         } else {
@@ -189,7 +202,7 @@ var IssueList = React.createClass({
                                                   {
                                                       className: "view-all",
                                                       onClick: function() {
-                                                          this.setState({limited: false})
+                                                          this.setState({limited: false});
                                                       }.bind(this)
                                                   },
                                                   "view all..."
@@ -207,20 +220,20 @@ var IssueList = React.createClass({
     }
 });
 
-var issueList = function(issues, loading) {
+var issueList = function (issues, loading) {
     return React.createElement(IssueList, {issues: issues, loading: loading});
 };
 
 var App = React.createClass({
-    componentDidMount: function() {
-        getOpenIssues(function(data) {
+    componentDidMount: function () {
+        getOpenIssues(function (data) {
             this.setState({
                 openIssues: data,
                 openIssuesLoading: false
             });
         }.bind(this));
 
-        getPotentiallyOpenIssues(function(data) {
+        getPotentiallyOpenIssues(function (data) {
             this.setState({
                 potentiallyOpenIssues: data,
                 potentiallyOpenIssuesLoading: false
@@ -228,7 +241,7 @@ var App = React.createClass({
         }.bind(this));
     },
 
-    getInitialState: function() {
+    getInitialState: function () {
         return {
             openIssuesLoading: true,
             potentiallyOpenIssuesLoading: true,
@@ -237,7 +250,7 @@ var App = React.createClass({
         };
     },
 
-    render: function() {
+    render: function () {
         return d.div(
             {},
             this.state.openIssuesLoading ? [] : feelingAdventurous(this.state.openIssues),
