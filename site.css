@@ -115,3 +115,7 @@ h2 {
   font-size: 0.75em;
   color: rgba(140, 139, 139, 0.77);
 }
+
+#footer {
+  display: none;
+}
