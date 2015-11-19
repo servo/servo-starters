@@ -15,7 +15,11 @@ var extractFunction = function (callback) {
     all.sort(timeSort);
 
     callback(all);
-  }
+  };
+};
+
+var extractLabel = function (label, regex) {
+  return label.match(regex)[1];
 };
 
 var issuesUrl = "https://api.github.com/search/issues";
@@ -91,10 +95,6 @@ var makeLabelFriendly = function (label) {
   });
 
   return newLabel;
-};
-
-var extractLabel = function (label, regex) {
-  return label.match(regex)[1];
 };
 
 var label = function (data) {
