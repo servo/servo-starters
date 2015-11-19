@@ -1,0 +1,22 @@
+{
+  "name": "servo-starters",
+  "version": "0.0.1",
+  "description": "Website for Servo Starters",
+  "main": "site.js",
+  "scripts": {
+    "test": "node node_modules/jshint/bin/jshint site.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:servo/servo-starters.git"
+  },
+  "author": "",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mfeckie/servo-starters/issues"
+  },
+  "homepage": "https://github.com/mfeckie/servo-starters#readme",
+  "devDependencies": {
+    "jshint": "^2.8.0"
+  }
+}
