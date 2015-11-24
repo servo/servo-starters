@@ -145,7 +145,13 @@ var labels = function (data) {
     return React.createElement(Labels, data);
 };
 
+var repoUrl = function(url) {
+    var urlArray = url.split("/");
+    return urlArray[urlArray.length - 3];
+};
+
 var Issue = React.createClass({
+
     render: function () {
         return d.li(
             {className: "issue"},
@@ -158,7 +164,7 @@ var Issue = React.createClass({
                         href: this.props.html_url,
                         title: this.props.title
                     },
-                    this.props.number
+                    repoUrl(this.props.html_url) + " " + this.props.number
                 ),
                 " ] - ",
                 d.span(
