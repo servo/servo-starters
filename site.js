@@ -3,7 +3,66 @@
 var d = React.DOM;
 
 var timeSort = function (l, r) {
-  return r.created_at.localeCompare(l.created_at);
+    return r.created_at.localeCompare(l.created_at);
+};
+
+var repoDefaults = [
+    { repo: "highfive", language: "L-python" },
+    { repo: "servo-starters", language: "L-javascript" }
+];
+
+var langLabels = [{
+        name: "L-rust",
+        color: "bfd4f2",
+        url:  "https://api.github.com/servo/servo/labels/L-rust",
+        selected: true
+    },
+    {
+        name: "L-python",
+        color: "bfd4f2",
+        url:  "https://api.github.com/servo/servo/labels/L-python",
+        selected: true
+    },
+    {
+        name: "L-javascript",
+        color: "bfd4f2",
+        url:  "https://api.github.com/servo/servo/labels/L-javascript",
+        selected: true
+    }
+];
+
+var getIssueLanguageLabel = function (issue) {
+    for (var i = 0; i < issue.labels.length; i++) {
+        var label = issue.labels[i];
+        if (/^L-(.*)/.test(label.name)) {
+            return label;
+        }
+    }
+    return null;
+};
+
+var addDefaultLanguageLabel = function (issue) {
+    if (getIssueLanguageLabel(issue) !== null) {
+        return issue;
+    }
+
+    var defaultLanguageLabelName = "L-rust";
+    for (var i = 0; i < repoDefaults.length; i++) {
+        var repoUrlSubStr = "servo/" + repoDefaults[i].repo + "/issues";
+        if (issue.url && issue.url.match(repoUrlSubStr)) {
+            defaultLanguageLabelName = repoDefaults[i].language;
+            break;
+        }
+    }
+
+    var defaultLanguageLabelIndex = langLabels.map(function (l) {
+        return l.name;
+    }).indexOf(defaultLanguageLabelName);
+
+    if (langLabels[defaultLanguageLabelIndex]) {
+        issue.labels.push(langLabels[defaultLanguageLabelIndex]);
+    }
+    return issue;
 };
 
 var extractFunction = function (callback) {
@@ -13,7 +72,7 @@ var extractFunction = function (callback) {
         all = easies.concat(lessEasies);
 
     all.sort(timeSort);
-
+    all.map(addDefaultLanguageLabel);
     callback(all);
   };
 };
@@ -145,6 +204,43 @@ var labels = function (data) {
     return React.createElement(Labels, data);
 };
 
+
+var FilterLabel = React.createClass({
+  render: function () {
+    var color = (this.props.color === "d7e102" ||
+                 this.props.color === "bfd4f2" ||
+                 this.props.color === "d4c5f9" ||
+                 this.props.color === "02d7e1") ? "black" : "white";
+
+    var friendlyLabel = makeLabelFriendly(this.props.name);
+    return d.span({className: "label",
+                   style: {backgroundColor: "#" + this.props.color,
+                           color: color,
+                           cursor: "pointer",
+                           opacity: this.props.selected ? 1.0 : 0.5},
+                   onClick: this.props.onClick.bind(null, this.props)},
+                   friendlyLabel);
+  }
+});
+
+var filterLabel = function (data) {
+  return React.createElement(FilterLabel, data);
+};
+
+var WantToWorkWith = React.createClass({
+  render: function () {
+    return d.span({className: "labels"}, this.props.labels.map(filterLabel));
+  }
+});
+
+var wantToWorkWith = function (labels, onClick) {
+  return React.createElement(WantToWorkWith, {labels: labels.map(function (label) {
+    label.onClick = onClick;
+    return label;
+  })});
+};
+
+
 var repoUrl = function(url) {
     var urlArray = url.split("/");
     return urlArray[urlArray.length - 3];
@@ -194,14 +290,32 @@ var IssueList = React.createClass({
         };
     },
 
+    getIssuesWithSelectedLabels: function (issues, selectedLabels) {
+        var labelNames = selectedLabels.map(function (label) {
+            return label.name;
+        });
+
+        var filteredIssues = issues.filter(function (issue) {
+            for (var i = 0; i < issue.labels.length; i++) {
+                if (labelNames.indexOf(issue.labels[i].name) > -1) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return filteredIssues;
+    },
+
     render: function () {
         if (this.props.loading) {
             return d.div({id: "loading"});
         } else {
-            var issues;
+            var issues = this.getIssuesWithSelectedLabels(
+                this.props.issues, this.props.selectedLabels);
 
-            if (this.state.limited) {
-                issues = this.props.issues.map(issueItem)
+            if (this.state.limited && issues.length > 5) {
+                issues = issues.map(issueItem)
                                           .slice(0, 5)
                                           .concat(
                                               d.div(
@@ -215,7 +329,7 @@ var IssueList = React.createClass({
                                               )
                                           );
             } else {
-                issues = this.props.issues.map(issueItem);
+                issues = issues.map(issueItem);
             }
 
             return d.ul(
@@ -226,11 +340,28 @@ var IssueList = React.createClass({
     }
 });
 
-var issueList = function (issues, loading) {
-    return React.createElement(IssueList, {issues: issues, loading: loading});
+var issueList = function (issues, loading, filters) {
+    var selectedLabels = filters.filter(function (label) {
+        return label.selected;
+    });
+    return React.createElement(IssueList, {issues: issues, loading: loading, selectedLabels: selectedLabels});
 };
 
 var App = React.createClass({
+    selectFilter: function (filterProps) {
+        for (var i = 0; i < this.state.languageFilters.length; i++) {
+            if (this.state.languageFilters[i].name === filterProps.name) {
+                break;
+            }
+        }
+
+        this.setState(function (oldState) {
+            var lf = oldState.languageFilters;
+            lf[i].selected = !lf[i].selected;
+            return {languageFilters: lf};
+        });
+    },
+
     componentDidMount: function () {
         getOpenIssues(function (data) {
             this.setState({
@@ -252,7 +383,8 @@ var App = React.createClass({
             openIssuesLoading: true,
             potentiallyOpenIssuesLoading: true,
             openIssues: [],
-            potentiallyOpenIssues: []
+            potentiallyOpenIssues: [],
+            languageFilters: langLabels
         };
     },
 
@@ -260,10 +392,16 @@ var App = React.createClass({
         return d.div(
             {},
             this.state.openIssuesLoading ? [] : feelingAdventurous(this.state.openIssues),
+
+            this.state.openIssuesLoading ? [] : d.div({className: "language-picker"},
+                d.h5({}, "and I want to work with: "),
+                wantToWorkWith(this.state.languageFilters, this.selectFilter)),
+
             d.h2({}, "Open Issues"),
-            issueList(this.state.openIssues, this.state.openIssuesLoading),
+            issueList(this.state.openIssues, this.state.openIssuesLoading, this.state.languageFilters),
+
             d.h2({}, "Potentially Open Issues"),
-            issueList(this.state.potentiallyOpenIssues, this.state.potentiallyOpenIssuesLoading)
+            issueList(this.state.potentiallyOpenIssues, this.state.potentiallyOpenIssuesLoading, this.state.languageFilters)
         );
     }
 });

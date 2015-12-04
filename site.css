@@ -119,3 +119,7 @@ h2 {
 #footer {
   display: none;
 }
+
+.language-picker {
+  text-align: center;
+}
