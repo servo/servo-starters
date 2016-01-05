@@ -8,7 +8,8 @@ var timeSort = function (l, r) {
 
 var repoDefaults = [
     { repo: "highfive", language: "L-python" },
-    { repo: "servo-starters", language: "L-javascript" }
+    { repo: "servo-starters", language: "L-javascript" },
+    { repo: "crowbot", language: "L-javascript" }
 ];
 
 var langLabels = [{
