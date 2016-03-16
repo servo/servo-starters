@@ -9,7 +9,8 @@ var timeSort = function (l, r) {
 var repoDefaults = [
     { repo: "highfive", language: "L-python" },
     { repo: "servo-starters", language: "L-javascript" },
-    { repo: "crowbot", language: "L-javascript" }
+    { repo: "crowbot", language: "L-javascript" },
+    { repo: "saltfs", language: "L-saltstack" },
 ];
 
 var langLabels = [{
@@ -29,7 +30,13 @@ var langLabels = [{
         color: "bfd4f2",
         url:  "https://api.github.com/servo/servo/labels/L-javascript",
         selected: true
-    }
+    },
+    {
+        name: "L-saltstack",
+        color: "bfd4f2",
+        url:  "https://api.github.com/servo/servo/labels/L-saltstack",
+        selected: true
+    },
 ];
 
 var getIssueLanguageLabel = function (issue) {
