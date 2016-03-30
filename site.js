@@ -81,6 +81,9 @@ var extractFunction = function (callback) {
 
     all.sort(timeSort);
     all.map(addDefaultLanguageLabel);
+    all.filter(function(issue) {
+      return issue.labels.indexOf("C-has open PR") === -1;
+    });
     callback(all);
   };
 };
