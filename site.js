@@ -81,9 +81,6 @@ var extractFunction = function (callback) {
 
     all.sort(timeSort);
     all.map(addDefaultLanguageLabel);
-    all.filter(function(issue) {
-      return issue.labels.indexOf("C-has open PR") === -1;
-    });
     callback(all);
   };
 };
@@ -103,13 +100,13 @@ var getPotentiallyOpenIssues = function (callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+user:servo&sort=updated"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=updated"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
     });
 
     var dataExtractor = extractFunction(callback);
