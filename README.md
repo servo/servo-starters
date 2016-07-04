@@ -6,7 +6,7 @@ introductory Servo issues. If you have a problem with Servo itself, please
 
 ## Installing dependencies
 
-NPM is used to manage testing dependencies.  `npm install` is required if you
+NPM is used to manage testing dependencies. `npm install` is required if you
 are going to run the tests.
 
 ## Running JS Hint
@@ -16,8 +16,8 @@ passes when making changes to the codebase.
 
 ## Contributing
 
-Servo Starters welcomes contribution from everyone. You can check out 
-[Servo's Contributing Docs](servo/CONTRIBUTING.md) for details on creating a 
+Servo Starters welcomes contribution from everyone. You can check out
+[Servo's Contributing Docs](https://github.com/servo/servo/blob/master/CONTRIBUTING.md) for details on creating a
 pull request to Servo or Servo Starters.  We also follow the
 [Rust Code of Conduct](https://www.rust-lang.org/conduct.html).
 
