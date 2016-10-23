@@ -119,13 +119,13 @@ var getOpenIssues = function (callback) {
     var easy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+label:E-Easy+user:servo&sort=created"
+        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:E-Easy+user:servo&sort=created"
     });
 
     var lessEasy = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+label:\"E-Less%20easy\"+user:servo&sort=created"
+        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:\"E-Less%20easy\"+user:servo&sort=created"
     });
 
     var dataExtractor = extractFunction(callback);
