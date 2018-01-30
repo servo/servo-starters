@@ -11,6 +11,7 @@ var repoDefaults = [
     { repo: "servo-starters", language: "L-javascript" },
     { repo: "crowbot", language: "L-javascript" },
     { repo: "saltfs", language: "L-saltstack" },
+    { repo: "buildbotstatus", language: "L-javascript" },
 ];
 
 var langLabels = [{
