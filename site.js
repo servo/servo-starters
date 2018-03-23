@@ -12,6 +12,7 @@ var repoDefaults = [
     { repo: "crowbot", language: "L-javascript" },
     { repo: "saltfs", language: "L-saltstack" },
     { repo: "buildbotstatus", language: "L-javascript" },
+    { repo: "homu", language: "L-python" },
 ];
 
 var langLabels = [{
