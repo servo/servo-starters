@@ -4,5 +4,3 @@ node_js:
 branches:
   only:
     - gh-pages
-notifications:
-  webhooks: http://build.servo.org:54856/travis
