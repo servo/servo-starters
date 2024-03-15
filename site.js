@@ -99,40 +99,52 @@ var getPotentiallyOpenIssues = function (callback) {
         twoWeeksAgo = new Date(today - 86400000 * 14),
         olderThanTwoWeeks = "<" + twoWeeksAgo.toISOString().slice(0, 10);
 
-    var easy = $.ajax({
+    var lessComplex = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-Easy+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-less-complex+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
     });
 
-    var lessEasy = $.ajax({
+    var newcomer = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-Less%20easy\"+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:B-newcomer+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+    });
+
+    var mentoringCandidate = $.ajax({
+        dataType: "json",
+        url: issuesUrl,
+        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-candidate-for-mentoring\"+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
     });
 
     var dataExtractor = extractFunction(callback);
 
-    $.when(easy, lessEasy).done(dataExtractor);
+    $.when(lessComplex, newcomer, mentoringCandidate).done(dataExtractor);
 };
 
 var getOpenIssues = function (callback) {
 
-    var easy = $.ajax({
+    var lessComplex = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:E-Easy+user:servo&sort=created"
+        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:E-less-complex+user:servo&sort=created"
     });
 
-    var lessEasy = $.ajax({
+    var newcomer = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:\"E-Less%20easy\"+user:servo&sort=created"
+        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:B-newcomer+user:servo&sort=created"
+    });
+
+    var mentoringCandidate = $.ajax({
+        dataType: "json",
+        url: issuesUrl,
+        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:\"E-candidate-for-mentoring\"+user:servo&sort=created"
     });
 
     var dataExtractor = extractFunction(callback);
 
-    $.when(easy, lessEasy).done(dataExtractor);
+    $.when(lessComplex, newcomer, mentoringCandidate).done(dataExtractor);
 };
 
 var replacers = [
@@ -140,17 +152,16 @@ var replacers = [
   {matcher: /^A-(.*)/, replacement: "Area: "},
   {matcher: /^(?:S-|C-)(.*)/, replacement: "Status: "},
   {matcher: /^P-(.*)/, replacement: "Platform: "},
-  {matcher: /^B-(.*)/, replacement: ""},
-  {matcher: /^I-(.*)/, replacement: "Category: "}
+  {matcher: /^B-(.*)/, replacement: "Category: "},
+  {matcher: /^I-(.*)/, replacement: "Impact: "}
 ];
 
 var makeLabelFriendly = function (label) {
   var newLabel = label;
 
   var labelMap = {
-    "E-easy": "Good first PR",
-    "E-Easy": "Good first PR",
-    "E-less easy": "Mentored"
+    "E-less-complex": "Good first PR",
+    "E-candidate-for-mentoring": "Mentored"
   };
 
   if (labelMap[label]) {
