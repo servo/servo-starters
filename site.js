@@ -116,7 +116,7 @@ var getPotentiallyOpenIssues = function (callback) {
     var mentoringCandidate = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=" + commonQuery + "+label:\"E-candidate-for-mentoring\"&" + sort"
+        data: "q=" + commonQuery + "+label:\"E-candidate-for-mentoring\"&" + sort
     });
 
     var dataExtractor = extractFunction(callback);
