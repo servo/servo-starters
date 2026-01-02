@@ -97,24 +97,26 @@ var getPotentiallyOpenIssues = function (callback) {
 
     var today = new Date(),
         twoWeeksAgo = new Date(today - 86400000 * 14),
-        olderThanTwoWeeks = "<" + twoWeeksAgo.toISOString().slice(0, 10);
+        olderThanTwoWeeks = "<" + twoWeeksAgo.toISOString().slice(0, 10),
+        commonQuery = `updated:${olderThanTwoWeeks}+state:open+label:C-assigned+user:servo+-label:"C-has%20open%20PR"`,
+        sort = "sort=updated";
 
     var lessComplex = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:E-less-complex+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+        data: "q=" + commonQuery + "+label:E-less-complex&" + sort
     });
 
     var newcomer = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:B-newcomer+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+        data: "q=" + commonQuery + "+label:B-newcomer&" + sort
     });
 
     var mentoringCandidate = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=updated:" + olderThanTwoWeeks + "+state:open+label:C-assigned+label:\"E-candidate-for-mentoring\"+-label:\"C-has%20open%20PR\"+user:servo&sort=updated"
+        data: "q=" + commonQuery + "+label:\"E-candidate-for-mentoring\"&" + sort"
     });
 
     var dataExtractor = extractFunction(callback);
@@ -124,22 +126,25 @@ var getPotentiallyOpenIssues = function (callback) {
 
 var getOpenIssues = function (callback) {
 
+    const commonQuery = "state:open+no:assignee+-label:C-assigned+-label:S-blocked-on-external+user:servo"
+    const sort = "sort=created"
+
     var lessComplex = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:E-less-complex+user:servo&sort=created"
+        data: `q=${commonQuery}+label:E-less-complex&${sort}`
     });
 
     var newcomer = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:B-newcomer+user:servo&sort=created"
+        data: `q=${commonQuery}+label:B-newcomer&${sort}`
     });
 
     var mentoringCandidate = $.ajax({
         dataType: "json",
         url: issuesUrl,
-        data: "q=state:open+-label:C-assigned+-label:S-blocked-on-external+label:\"E-candidate-for-mentoring\"+user:servo&sort=created"
+        data: `q=${commonQuery}+label:"E-candidate-for-mentoring"&${sort}`
     });
 
     var dataExtractor = extractFunction(callback);
