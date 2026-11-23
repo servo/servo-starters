@@ -13,9 +13,9 @@
   "author": "",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/mfeckie/servo-starters/issues"
+    "url": "https://github.com/servo/servo-starters/issues"
   },
-  "homepage": "https://github.com/mfeckie/servo-starters#readme",
+  "homepage": "https://github.com/servo/servo-starters#readme",
   "devDependencies": {
     "jshint": "^2.8.0"
   }
