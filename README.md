@@ -17,11 +17,9 @@ passes when making changes to the codebase.
 ## Contributing
 
 Servo Starters welcomes contribution from everyone. You can check out
-[Servo's Contributing Docs](https://github.com/servo/servo/blob/master/CONTRIBUTING.md) for details on creating a
-pull request to Servo or Servo Starters.  We also follow the
-[Rust Code of Conduct](https://www.rust-lang.org/conduct.html).
+[Servo's Contributing Docs](https://book.servo.org/contributing/getting-started) for details on creating a
+pull request to Servo or Servo Starters.
 
 ## Communication
 
-Servo contributors frequent the [Servo room](https://chat.mozilla.org/#/room/#servo:mozilla.org) on [Mozilla Matrix](https://wiki.mozilla.org/Matrix).
-You can also join the [`dev-servo` mailing list](https://lists.mozilla.org/listinfo/dev-servo).
+Servo contributors frequent the [Servo Zulip chat](https://servo.zulipchat.com/).
